@@ -1,10 +1,36 @@
-import { Box, Button, Container, Flex, FormControl, Heading, HStack, IconButton, Input, VStack } from "@chakra-ui/react";
+import { Box,
+  Button,
+  Container, 
+  Flex, 
+  FormControl, 
+  Heading, 
+  HStack, 
+  IconButton, 
+  Input, 
+  VStack 
+}  from "@chakra-ui/react";
 import { FaMoon, FaPlus, FaTrash } from "react-icons/fa";
 import './index.css';
+import { useState } from 'react';
+import { nanoid } from "nanoid";
+
 
 function App() {
 
-  const Todos = [
+  //adding a list item
+
+  const [listitem, setListitem] = useState('');
+
+  function handleChange(e) {
+    setListitem(e.target.value);
+  }
+
+  function handleAdd(e) {
+    const newTodos = todos.concat();
+    setTodos(newTodos);
+  }
+
+  const [todos, setTodos] = useState([
     {
       id: 1,
       text: 'Buy Groceries'
@@ -17,7 +43,19 @@ function App() {
       id: 3,
       text: 'Go to the Cinema'
     }
-  ]
+  ]);
+  
+  //deleting an item
+  const removeElement = (id) => {
+    const newTodos = todos.filter(
+      (todo) => todo.id !== id
+    );
+    setTodos(newTodos);
+  };
+
+  const removeAll = () => {
+    document.getElementById('lists').style.display = 'none';
+  }
 
   return (
    <VStack>
@@ -35,29 +73,30 @@ function App() {
 
       <Container 
       w='400px'
-      h='520px'
+      h='100%'
       border='1px'
       boxShadow='lg'
       borderRadius='lg'
       borderStyle='solid'
       borderColor='gray'
-      p='20px'>
+      p='20px'
+      >
         <Heading>TodoList</Heading>
         <Flex 
         mt='30px'
         gap='20px'
         >
           <FormControl>
-           <Input type='text' placeholder='Add your new todo' h={12} />
+           <Input type='text' placeholder='Add your new todo' h={12} value={listitem} onChange={handleChange} />
           </FormControl>
-          <Button colorScheme='green' h={12}>
+          <Button colorScheme='green' h={12} onClick={() => handleAdd()} >
             <FaPlus />
           </Button>
         </Flex>
 
-        <Box>
-        {Todos.map(({text}) => (
-                <div key={Todos.id}
+        <Box id='lists'>
+        {todos.map((todo) => (
+                <div key={todos.id}
                 style={{display: 'flex', gap: 20}}>
                    <Flex 
                    mt='20px'
@@ -67,12 +106,14 @@ function App() {
                    pl='20px'
                    borderRadius='lg'
                    w='300px'>
-                     <p>{text}</p>
+                     <p>{todo.text}</p>
                    </Flex>
                    <Button
                    mt='22px'
                    h={12}
-                   colorScheme='red'>
+                   colorScheme='red'
+                   onClick={() => removeElement(todo.id)}
+                   >
                   <FaTrash />
                 </Button> 
                 </div>
@@ -81,12 +122,13 @@ function App() {
 
          {/* clear all section */}
       <HStack 
-      mt='100px'
+      mt='20px'
       ml='260px'>
         <Button 
         size='md'
         colorScheme='purple'
         color='#fff'
+        onClick={() => removeAll()}
         >
           Clear All
         </Button>
