@@ -1,141 +1,55 @@
-import { Box,
-  Button,
-  Container, 
-  Flex, 
-  FormControl, 
-  Heading, 
-  HStack, 
-  IconButton, 
-  Input, 
-  VStack 
-}  from "@chakra-ui/react";
-import { FaMoon, FaPlus, FaTrash } from "react-icons/fa";
-import './index.css';
-import { useState } from 'react';
-import { nanoid } from "nanoid";
-
+import { Heading } from '@chakra-ui/react';
+import TodoList from './components/TodoList';
+import AddTodo from './components/AddTodo';
+import { VStack, IconButton, useColorMode } from '@chakra-ui/react';
+import { FaSun, FaMoon } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 
 function App() {
 
-  //adding a list item
 
-  const [listitem, setListitem] = useState('');
+  const [todos, setTodos] = useState(
+    () => JSON.parse(localStorage.getItem('todos')) || []
+  );
 
-  function handleChange(e) {
-    setListitem(e.target.value);
-  }
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
 
-  function handleAdd(e) {
-    const newTodos = todos.concat();
+  function deleteTodo(id) {
+    const newTodos = todos.filter((todo) => {
+      return todo.id !== id;
+    });
     setTodos(newTodos);
   }
 
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      text: 'Buy Groceries'
-    },
-    {
-      id: 2,
-      text: 'Do Laundry'
-    },
-    {
-      id: 3,
-      text: 'Go to the Cinema'
-    }
-  ]);
-  
-  //deleting an item
-  const removeElement = (id) => {
-    const newTodos = todos.filter(
-      (todo) => todo.id !== id
-    );
-    setTodos(newTodos);
-  };
-
-  const removeAll = () => {
-    document.getElementById('lists').style.display = 'none';
+  function addTodo(todo) {
+    setTodos([...todos, todo]);
   }
+
+  const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-   <VStack>
-
-      {/* darkmode section */}
-      <HStack 
-      alignSelf='flex-end'
-      m='30px'>
-        <IconButton isRound='true'>
-          <FaMoon />
-        </IconButton>
-      </HStack>
-
-      {/* task listing part */}
-
-      <Container 
-      w='400px'
-      h='100%'
-      border='1px'
-      boxShadow='lg'
-      borderRadius='lg'
-      borderStyle='solid'
-      borderColor='gray'
-      p='20px'
+    <VStack p={4}>
+      <IconButton
+        icon={colorMode === 'light' ? <FaSun /> : <FaMoon />}
+        isRound='true'
+        size='lg'
+        alignSelf='flex-end'
+        onClick={toggleColorMode}
+      />
+      <Heading
+        mb='8'
+        fontWeight='extrabold'
+        size='2xl'
+        bgGradient='linear(90deg, #FDBB2D 0%, #3A1C71 100%)'
+        bgClip='text'
       >
-        <Heading>TodoList</Heading>
-        <Flex 
-        mt='30px'
-        gap='20px'
-        >
-          <FormControl>
-           <Input type='text' placeholder='Add your new todo' h={12} value={listitem} onChange={handleChange} />
-          </FormControl>
-          <Button colorScheme='green' h={12} onClick={() => handleAdd()} >
-            <FaPlus />
-          </Button>
-        </Flex>
-
-        <Box id='lists'>
-        {todos.map((todo) => (
-                <div key={todos.id}
-                style={{display: 'flex', gap: 20}}>
-                   <Flex 
-                   mt='20px'
-                   bg='#f3f1f4'
-                   h={12}
-                   alignItems='center'
-                   pl='20px'
-                   borderRadius='lg'
-                   w='300px'>
-                     <p>{todo.text}</p>
-                   </Flex>
-                   <Button
-                   mt='22px'
-                   h={12}
-                   colorScheme='red'
-                   onClick={() => removeElement(todo.id)}
-                   >
-                  <FaTrash />
-                </Button> 
-                </div>
-            ))}
-        </Box>
-
-         {/* clear all section */}
-      <HStack 
-      mt='20px'
-      ml='260px'>
-        <Button 
-        size='md'
-        colorScheme='purple'
-        color='#fff'
-        onClick={() => removeAll()}
-        >
-          Clear All
-        </Button>
-      </HStack>
-      </Container>
-
-   </VStack>
+        Daily Tasks
+      </Heading>
+      <TodoList todos={todos} deleteTodo={deleteTodo}  />
+      <AddTodo addTodo={addTodo} />
+    </VStack>
   );
 }
 
